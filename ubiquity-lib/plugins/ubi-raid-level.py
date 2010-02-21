@@ -87,11 +87,11 @@ class PageGtk(PluginUI):
 		import pygtk
 		import gtk
 		if self.useEmailCheck.get_active():
-			self.useGmailControl.setSensitive(True)
-			self.emailTable.setSensitive(True)
+			self.useGmailControl.set_sensitive(True)
+			self.emailTable.set_sensitive(True)
 		else:
-			self.useGmailControl.setSensitive(False)
-			self.emailTable.setSensitive(False)
+			self.useGmailControl.set_sensitive(False)
+			self.emailTable.set_sensitive(False)
 			
 
 	def gmailControlCallback(self, gmailComboBox):
