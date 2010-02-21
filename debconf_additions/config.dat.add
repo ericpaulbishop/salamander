@@ -1,0 +1,21 @@
+
+Name: ubiquity/use_raid
+Template: ubiquity/use_raid
+Owners: ubiquity
+
+Name: ubiquity/raid_disks
+Template: ubiquity/raid_disks
+Owners: ubiquity
+
+Name: ubiquity/raid_level
+Template: ubiquity/raid_level
+Owners: ubiquity
+
+Name: ubiquity/raid_swap
+Template: ubiquity/raid_swap
+Owners: ubiquity
+
+Name: ubiquity/raid_file_system
+Template: ubiquity/raid_file_system
+Owners: ubiquity
+

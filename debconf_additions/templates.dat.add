@@ -1,0 +1,31 @@
+
+Name: ubiquity/use_raid
+Default: false
+Description: Do you want to install with software RAID?
+Type: boolean
+Owners: ubiquity/use_raid
+
+Name: ubiquity/raid_disks
+Default: 
+Description: What disks should be configured as RAID devices?
+Type: string
+Owners: ubiquity/raid_disks
+
+Name: ubiquity/raid_level
+Default: 
+Description: What RAID level do you want to use?
+Type: string
+Owners: ubiquity/raid_level
+
+Name: ubiquity/raid_swap
+Default: 
+Description: What size RAID swap partition do you want to use?
+Type: string
+Owners: ubiquity/raid_swap
+
+Name: ubiquity/raid_file_system
+Default: 
+Description: What file system should be used on root RAID partition?
+Type: string
+Owners: ubiquity/raid_file_system
+
