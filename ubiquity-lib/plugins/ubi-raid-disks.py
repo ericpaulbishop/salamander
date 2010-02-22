@@ -171,13 +171,14 @@ class PageGtk(PluginUI):
 				diskStr = diskStr + self.diskData[2][dindex]
 		return diskStr
 	
-	def setupDiskList(self, data):
+	def setupDiskList(self, data, usePreselected, diskDict):
 		import pygtk
 		import gtk
 		
 		self.diskData = data
 		devNames = data[0]
 		devParts = data[1]
+		devIds   = data[2]
 		
 		#remove old GUI elements
 		while len(self.checks) > 0:
@@ -185,7 +186,8 @@ class PageGtk(PluginUI):
 		
 		if self.diskContainer != None:
 			self.plugin_widgets.remove( self.diskContainer )
-		
+	
+
 		#setup disk checks
 		lineIndex = 0
 		self.diskContainer = gtk.VBox()
@@ -207,8 +209,15 @@ class PageGtk(PluginUI):
 			
 			check = gtk.CheckButton(diskName)
 			self.checks.append(check)
-			check.set_active(True)
 			container = offsetControl(check)
+			
+			if usePreselected:
+				if devIds[dindex] in diskDict:
+					check.set_active(True)
+				else:
+					check.set_active(False)
+			else:
+				check.set_active(True)
 			
 			lineIndex = lineIndex+1
 			self.diskContainer.pack_start(container, False, False, lineIndex)
@@ -224,7 +233,22 @@ class PageGtk(PluginUI):
 class Page(Plugin):
 	def prepare(self, unfiltered=False):
 		data = get_disk_data()
-		self.ui.setupDiskList(data)
+
+		preselectedDisks = self.db.get("ubiquity/raid_disks")
+		if preselectedDisks == None:
+			preselectedDisks = ""
+
+		preselectedList = re.split("\\?[,\t ]+", preselectedDisks)
+		
+		preselectedDict = {}
+		usePreselected = False
+		for disk in preselectedList:
+			if disk != "":
+				usePreselected = True
+				preselectedDict[ disk ] = 1
+		
+
+		self.ui.setupDiskList(data, usePreselected, preselectedDict)
 		return None
 
 	def ok_handler(self):
