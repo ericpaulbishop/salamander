@@ -61,9 +61,10 @@ class PageGtk(PluginUI):
 	useEmailCheck = None
 	useGmailControl = None
 	emailControls = []
+	gmailControls = []
 	emailTable = None
 	emailContainer = None
-
+	
 
 	currentLevel = "5"
 	def __init__(self, controller, *args, **kwargs):
@@ -100,7 +101,7 @@ class PageGtk(PluginUI):
 		self.rebuildEmailTable()
 
 
-	def setSelectionsFromDisks(self, diskStr, raidLevel, swapSize, fileSystem):
+	def setSelectionsFromDisks(self, diskStr, raidLevel, swapSize, fileSystem, emailParameters):
 		import pygtk
 		import gtk
 
@@ -258,6 +259,35 @@ class PageGtk(PluginUI):
 
 		self.rebuildEmailTable()
 		
+		if emailParameters[1] != None:
+			if emailParameters[1] != "":
+				if emailParameters[1] != "smtp.gmail.com"
+					self.useGmailControl.set_active(1)
+					self.rebuildEmailTable()
+					for cntlIndex in range(0:len(emailControls))
+						if emailParameters[cntlIndex+1] != None:
+							if emailParameters[cntlIndex+1] != "":
+								(self.emailControls[cntlIndex]).set_text( emailParameters[cntlIndex+1] )
+				else
+					if emailParameters[2] != None:
+							if emailParameters[2] != "":
+								(self.gmailControls[0]).set_text( emailParameters[2] )
+					if emailParameters[3] != None:
+							if emailParameters[3] != "":
+								(self.gmailControls[1]).set_text( emailParameters[3] )
+					if emailParameters[6] != None:
+							if emailParameters[6] != "":
+								(self.gmailControls[2]).set_text( emailParameters[6] )
+
+
+
+		if emailParameters[0] != None:
+			if emailParameters[0] == "false"
+				self.useEmailCheck.set_active(False)
+				self.useEmailCallback(self.useEmailCheck)
+		
+
+
 		self.plugin_widgets.pack_start(self.emailContainer, True, False, controlIndex)
 
 
@@ -270,25 +300,47 @@ class PageGtk(PluginUI):
 		if self.emailTable != None:
 			self.emailContainer.remove(self.emailTable)
 	
-		self.emailControls = []
+		emailLabels   = [ "\tEmail Server:", "\tServer User:", "\tServer Password:", "\tServer Port:", "\tFrom Address:", "\tRecipient Addresses:" ]
+		gmailLabels   = [ "\tGmail User:", "\tGmail Password:", "\tRecipient Addresses:" ]
+		emailDefaults = [ "smtp.myserver.com", "my_username", "", "25", "me@myserver.com", "recipient@somewhere.com"
+		gmailDefaults = [ "my_username@gmail.com", "", "recipient@somewhere.com" ]
+		
+		if len(emailDefaults) != len(self.emailControls):
+			self.emailControls = []
+			for cntlIndex in range(0:len(emailDefaults)):
+				cntl = gtk.Entry(50)
+				cntl.set_text( emailDefaults[cntlIndex] )
+				self.emailControls.append(cntl)
+
+		if len(gmailDefaults) != len(self.gmailControls):
+			self.gmailControls = []
+			for cntlIndex in range(0:len(gmailDefaults)):
+				cntl = gtk.Entry(50)
+				cntl.set_text( gmailDefaults[cntlIndex] )
+				self.gmailControls.append(cntl)
+
+
 		gmailSelection = self.useGmailControl.get_active_text()
 		
-		emailControlLabels = [ "\tEmail Server:", "\tServer User:", "\tServer Password:", "\tServer Port:", "\tFrom Address:", "\tRecipient Addresses:" ]
+		controlLabels = emailLabels
 		self.emailTable = gtk.Table(6,2)
+		controlList = emailControls
 		if gmailSelection == "Use Gmail":
-			emailControlLabels = ["\tGmail User:", "\tGmail Password:", "\tRecipient Addresses:" ]
-			self.emailTable = gtk.Table(3,2)
+			controlLabels = gmailLabels
+			controlList = gmailControls
 
-		self.emailControls = []	
+
 		tableRowIndex=0
 		for labelText in emailControlLabels:
-			eControl = gtk.Entry(50)
+			eControl = controlList[tableRowIndex]
 			eLabelContainer = labelControl("", gtk.Label(labelText), 1)
 			eControl.show()
 			self.emailTable.attach(eLabelContainer, 0, 1, tableRowIndex, tableRowIndex+1,gtk.FILL, gtk.FILL, 5)
 			self.emailTable.attach(eControl, 1, 2, tableRowIndex, tableRowIndex+1,gtk.FILL|gtk.EXPAND, gtk.FILL, 75)
 			tableRowIndex = tableRowIndex+1
-			self.emailControls.append(eControl)
+			if len(controlList) <= tableRowIndex:
+				self.emailControls.append(eControl)
+		
 
 		self.emailContainer.pack_start(self.emailTable, False, False, 2)
 		self.emailTable.show()
@@ -307,17 +359,41 @@ class PageGtk(PluginUI):
 		return str( (int(txt))*1024*1024)
 
 
+	def getEmailParameters(self):
+		gmailSelection = self.useGmailControl.get_active_text()
+		emailParams = []
+		if self.useEmailCheck.get_active():
+			emailParams.append("true")
+		else:
+			emailParams.append("false")
+
+		if gmailSelection == "Use Gmail":
+			user = ((gmailControls[0]).get_text()).lower()
+			if !re.search("gmail.com", user):
+				user = user + "@gmail.com"
+			emailParams = [ "smtp.gmail.com", user, (gmailControls[1]).get_text(), "587", user, (gmailControls[2]).get_text() ]
+		else
+			for paramIndex in range(0,len(emailControls)):
+				emailParams.append( (gmailControls[paramIndex]).get_text() )
+		
+		return emailParams
+
+
+
 	def getFileSystem(self):
 		return self.fileSystemControl.get_active_text()
 
 class Page(Plugin):
 	def prepare(self, unfiltered=False):
 		diskStr = self.db.get('ubiquity/raid_disks')
-		rl = self.db.get("ubiquity/raid_level")
-		sw = self.db.get("ubiquity/raid_swap")
-		fs = self.db.get("ubiquity/raid_file_system")
+		rl      = self.db.get("ubiquity/raid_level")
+		sw      = self.db.get("ubiquity/raid_swap")
+		fs      = self.db.get("ubiquity/raid_file_system")
 		
-		self.ui.setSelectionsFromDisks(diskStr, rl, sw, fs)
+		ep      = [ self.db.get("ubiquity/raid_use_email"), self.db.get("ubiquity/raid_email_server"), self.db.get("ubiquity/raid_email_user"), self.db.get("ubiquity/raid_email_password"), self.db.get("ubiquity/raid_email_port"), self.db.get("ubiquity/raid_email_from"), self.db.get("ubiquity/raid_email_to") ]
+		
+				
+		self.ui.setSelectionsFromDisks(diskStr, rl, sw, fs, ep)
 		
 		return None
 
@@ -325,8 +401,19 @@ class Page(Plugin):
 		raidLevel = self.ui.getRaidLevel()
 		swapSize = self.ui.getSwapSize() 
 		fileSystem = self.ui.getFileSystem()
-		self.preseed("ubiquity/raid_level", raidLevel)
-		self.preseed("ubiquity/raid_swap", swapSize)
-		self.preseed("ubiquity/raid_file_system", fileSystem)
+		emailParameters = self.ui.getEmailParameters()
+
+		self.preseed("ubiquity/raid_level",              raidLevel)
+		self.preseed("ubiquity/raid_swap",               swapSize)
+		self.preseed("ubiquity/raid_file_system",        fileSystem)
+		self.preseed("ubiquity/raid_use_email",          emailParameters[0])
+		self.preseed("ubiquity/raid_email_server",       emailParameters[1])
+		self.preseed("ubiquity/raid_email_user",         emailParameters[2])
+		self.preseed("ubiquity/raid_email_password",     emailParameters[3])
+		self.preseed("ubiquity/raid_email_port",         emailParameters[4])
+		self.preseed("ubiquity/raid_email_from",         emailParameters[5])
+		self.preseed("ubiquity/raid_email_to",           emailParameters[6])
+
+
 		Plugin.ok_handler(self)
 

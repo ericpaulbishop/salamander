@@ -19,3 +19,31 @@ Name: ubiquity/raid_file_system
 Template: ubiquity/raid_file_system
 Owners: ubiquity
 
+Name: ubiquity/raid_use_email
+Template: ubiquity/raid_use_email
+Owners: ubiquity
+
+Name: ubiquity/raid_email_server
+Template: ubiquity/raid_email_server
+Owners: ubiquity
+
+Name: ubiquity/raid_email_user
+Template: ubiquity/raid_email_user
+Owners: ubiquity
+
+Name: ubiquity/raid_email_password
+Template: ubiquity/raid_email_password
+Owners: ubiquity
+
+Name: ubiquity/raid_email_port
+Template: ubiquity/raid_email_port
+Owners: ubiquity
+
+Name: ubiquity/raid_email_from
+Template: ubiquity/raid_email_from
+Owners: ubiquity
+
+Name: ubiquity/raid_email_to
+Template: ubiquity/raid_email_to
+Owners: ubiquity
+

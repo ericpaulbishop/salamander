@@ -29,3 +29,45 @@ Description: What file system should be used on root RAID partition?
 Type: string
 Owners: ubiquity/raid_file_system
 
+Name: ubiquity/raid_use_email
+Default: false
+Description: Do you want to configure email notification on RAID disk failure?
+Type: boolean
+Owners: ubiquity/raid_use_email
+
+Name: ubiquity/raid_email_server
+Default:
+Description: What email server should be used to send RAID notifications?
+Type: string
+Owners: ubiquity/raid_email_server
+
+Name: ubiquity/raid_email_user
+Default:
+Description: What email user should be used to send RAID notifications?
+Type: string
+Name: ubiquity/raid_email_user
+
+Name: ubiquity/raid_email_password
+Default:
+Description: What email password should be used to send RAID notifications?
+Type: string
+Name: ubiquity/raid_email_password
+
+Name: ubiquity/raid_email_port
+Default:
+Description: What email port should be used to send RAID notifications?
+Type: string
+Name: ubiquity/raid_email_port
+
+Name: ubiquity/raid_email_from
+Default:
+Description: What email from address should be used to send RAID notifications?
+Type: string
+Name: ubiquity/raid_email_from
+
+Name: ubiquity/raid_email_to
+Default:
+Description: To what address(es) should RAID email notifications be sent?
+Type: string
+Name: ubiquity/raid_email_to
+
