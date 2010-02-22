@@ -100,12 +100,13 @@ class PageGtk(PluginUI):
 		self.rebuildEmailTable()
 
 
-	def setSelectionsFromDisks(self, diskStr):
+	def setSelectionsFromDisks(self, diskStr, raidLevel, swapSize, fileSystem):
 		import pygtk
 		import gtk
 
 		#initialize RAID levels
 		diskList = re.split("[\t ]+", diskStr);
+		levelDict = { "5":0, "0":1 } 
 		self.levelNumbers = ["5", "0" ] 
 		raidDescriptionList = 	[	"RAID Level 5  (Block Striping With Parity)", 
 						"RAID Level 0  (Striping)"
@@ -115,6 +116,7 @@ class PageGtk(PluginUI):
 			currentLevel = "10"
 			if len(diskList) > 3 :
 				self.levelNumbers = ["10", "6", "5", "1", "0"]
+				levelDict = { "10":0, "6":1, "5":2, "1":3, "0":4 } 
 				raidDescriptionList = [	"RAID Level 10 (Mirroring+Striping)",
 							"RAID Level 6  (Block Striping With Dual Parity)", 
 							"RAID Level 5  (Block Striping With Parity)", 
@@ -123,6 +125,7 @@ class PageGtk(PluginUI):
 							]
 			else:
 				self.levelNumbers = ["10", "5", "1", "0"]
+				levelDict = { "10":0, "5":1, "1":2, "0":3 } 
 				raidDescriptionList = [	"RAID Level 10 (Mirroring+Striping)",
 							"RAID Level 5  (Block Striping With Parity)", 
 							"RAID Level 1  (Mirroring)",
@@ -161,12 +164,17 @@ class PageGtk(PluginUI):
 		levlabContainer.show()
 		levelLabel.show()
 
+		selectedLevelIndex = 0
+		if raidLevel != None:
+			if raidLevel in levelDict:
+				selectedLevelIndex = levelDict[ raidLevel ]
+
 		for levindex in range(0,len(self.levelNumbers)):
 			group = None
 			if len(self.levelRadios) > 0:
 				group = self.levelRadios[0]
 			radio = gtk.RadioButton(group, raidDescriptionList[levindex],False)
-			if len(self.levelRadios) == 0:
+			if len(self.levelRadios) == selectedLevelIndex:
 				radio.set_active(True)
 				self.currentLevel = self.levelNumbers[levindex]
 			radio.connect("toggled", self.levelRadioCallback, self.levelNumbers[levindex])
@@ -183,6 +191,20 @@ class PageGtk(PluginUI):
 		
 		
 		#setup swap & file system drop-downs
+		mb = 1024*1024
+		swapDict = { 4096*mb:0, 3072*mb:1, 2048*mb:2, 1536*mb:3, 1024*mb:4, 512*mb:5, 256*mb:6, 0*mb:7}
+		swapIndex = 2
+		if swapSize != None:
+			if swapSize != "":
+				if int(swapSize) in swapDict:
+					swapIndex = swapDict[ int(swapSize) ]
+
+		fsDict = { "ext4":0, "ext3":1, "xfs":2 }
+		fsIndex = 0
+		if fileSystem != None:
+			if fileSystem in fsDict:
+				fsIndex = fsDict[ fileSystem ]
+
 		self.swapControl = gtk.combo_box_new_text()
 		self.swapControl.append_text("4096MB")
 		self.swapControl.append_text("3072MB")
@@ -192,14 +214,14 @@ class PageGtk(PluginUI):
 		self.swapControl.append_text(" 512MB")
 		self.swapControl.append_text(" 256MB")
 		self.swapControl.append_text("  None")
-		self.swapControl.set_active(2)
+		self.swapControl.set_active(swapIndex)
 		self.swapControl.show()
 		
 		self.fileSystemControl = gtk.combo_box_new_text()
 		self.fileSystemControl.append_text("ext4")
 		self.fileSystemControl.append_text("ext3")
 		self.fileSystemControl.append_text("xfs")
-		self.fileSystemControl.set_active(0)
+		self.fileSystemControl.set_active(fsIndex)
 		self.fileSystemControl.show()
 
 		swapLabelContainer = labelControl("", gtk.Label("Swap Size: "), 1)
@@ -291,7 +313,12 @@ class PageGtk(PluginUI):
 class Page(Plugin):
 	def prepare(self, unfiltered=False):
 		diskStr = self.db.get('ubiquity/raid_disks')
-		self.ui.setSelectionsFromDisks(diskStr)
+		rl = self.db.get("ubiquity/raid_level")
+		sw = self.db.get("ubiquity/raid_swap")
+		fs = self.db.get("ubiquity/raid_file_system")
+		
+		self.ui.setSelectionsFromDisks(diskStr, rl, sw, fs)
+		
 		return None
 
 	def ok_handler(self):
