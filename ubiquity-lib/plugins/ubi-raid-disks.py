@@ -238,7 +238,7 @@ class Page(Plugin):
 		if preselectedDisks == None:
 			preselectedDisks = ""
 
-		preselectedList = re.split("\\?[,\t ]+", preselectedDisks)
+		preselectedList = re.split("\\\\?[,\t ]+", preselectedDisks)
 		
 		preselectedDict = {}
 		usePreselected = False
