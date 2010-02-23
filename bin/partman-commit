@@ -13,8 +13,23 @@ if [ "$RET" = "true" ] ; then
 	swap_size="$RET"
 	db_get ubiquity/raid_file_system
 	file_system="$RET"
+
+	db_get ubiquity/raid_use_email
+	use_email="$RET"
+	db_get ubiquity/raid_email_server
+	email_server="$RET"
+	db_get ubiquity/raid_email_user
+	email_user="$RET"
+	db_get ubiquity/raid_email_password
+	email_password="$RET"
+	db_get ubiquity/raid_email_port
+	email_port="$RET"
+	db_get ubiquity/raid_email_from
+	email_from="$RET"
+	db_get ubiquity/raid_email_to
+	email_to="$RET"
 	
-	python /usr/lib/ubiquity/raid/raid-apply.py "$disks" "$swap_size" "$level" "$file_system"
+	python /usr/lib/ubiquity/raid/raid-apply.py "$disks" "$swap_size" "$level" "$file_system" "$use_email" "$email_server" "$email_user" "$email_password" "$email_port" "$email_from" "$email_to"
 	
 	exit 0
 fi

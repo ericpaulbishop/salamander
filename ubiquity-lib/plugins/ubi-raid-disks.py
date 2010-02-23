@@ -57,10 +57,6 @@ def get_disk_data():
 	os.system("sudo swapoff -a")
 	os.system("sudo /etc/init.d/mdadm stop")
 	os.system("sudo killall mdadm")
-	os.system("sudo mdadm -f --manage /dev/md_d0 --stop")
-	os.system("sudo mdadm -f --manage /dev/md0 --stop")
-	os.system("sudo mdadm -f --manage /dev/md_d1 --stop")
-	os.system("sudo mdadm -f --manage /dev/md1 --stop")
 
 	diskLines = re.split("[\r\n]+", run_shell("sudo fdisk -l 2>/dev/null | grep dev | grep Disk"))
 	partedLines = re.split("[\r\n]+", run_shell("sudo parted -l"))

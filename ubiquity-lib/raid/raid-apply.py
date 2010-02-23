@@ -81,7 +81,7 @@ def get_disk_data():
 
 	return [diskNames, diskText, diskDevs, diskSizes]
 
-def initialize_raid(raidStr, swapSize, raidLevel, fstype):
+def initialize_raid(raidStr, swapSize, raidLevel, fstype, emailParams):
 	
 	#build index of raid disks
 	raidList = re.split("[\t ]+", raidStr)
@@ -136,22 +136,8 @@ def initialize_raid(raidStr, swapSize, raidLevel, fstype):
 			os.system("sudo parted -s " + diskDev + " mkpart primary " + swapPartStartEnd )
 			os.system("sudo parted -s " + diskDev + " set 2 raid on")
 
-		#if raid disks already exist, stop them
-		#this produces errors if they don't exist, but who cares?
-		#no one ever sees the error messages			
-		os.system("sudo mdadm -f --manage /dev/md_d0 --fail " + diskDev + "  >/dev/null 2>&1")
-		os.system("sudo mdadm -f --manage /dev/md_d0 --fail " + diskDev + "1 >/dev/null 2>&1")
-		os.system("sudo mdadm -f --manage /dev/md0 --fail " + diskDev + "1 >/dev/null 2>&1")
-		
-		os.system("sudo mdadm -f --manage /dev/md_d1 --fail " + diskDev + "  >/dev/null 2>&1")
-		os.system("sudo mdadm -f --manage /dev/md_d1 --fail " + diskDev + "2 >/dev/null 2>&1")
-		os.system("sudo mdadm -f --manage /dev/md1 --fail " + diskDev + "2 >/dev/null 2>&1")
 
 
-	os.system("sudo mdadm -f --manage /dev/md_d0 --stop >/dev/null 2>&1")
-	os.system("sudo mdadm -f --manage /dev/md0 --stop >/dev/null 2>&1")
-	os.system("sudo mdadm -f --manage /dev/md_d1 --stop >/dev/null 2>&1")
-	os.system("sudo mdadm -f --manage /dev/md1 --stop >/dev/null 2>&1")
 
 
 
@@ -211,12 +197,30 @@ def initialize_raid(raidStr, swapSize, raidLevel, fstype):
 	os.system( "if [ -e /dev/scd0 ] ; then sudo echo \"/dev/scd0       /media/cdrom0   udf,iso9660 user,noauto,exec,utf8 0       0\" >> /target/etc/fstab ; fi")
 
 
+	#setup email script if requested
+	if emailParams[0] == "true":
+		os.system("sudo mkdir -p /etc/raid_scripts")
+		os.system("sudo echo '#!/usr/bin/python'>/etc/raid_scripts/mail_alert")
+		os.system("sudo echo ''>>/etc/raid_scripts/mail_alert")
+		os.system("sudo echo 'serverName     =\"" + emailParams[1] + "\"'>>/etc/raid_scripts/mail_alert")
+		os.system("sudo echo 'serverUserName =\"" + emailParams[2] + "\"'>>/etc/raid_scripts/mail_alert")
+		os.system("sudo echo 'serverPassword =\"" + emailParams[3] + "\"'>>/etc/raid_scripts/mail_alert")
+		os.system("sudo echo 'serverPort     =\"" + emailParams[4] + "\"'>>/etc/raid_scripts/mail_alert")
+		os.system("sudo echo 'mailFrom       =\"" + emailParams[5] + "\"'>>/etc/raid_scripts/mail_alert")
+		os.system("sudo echo 'mailTo         =\"" + emailParams[6] + "\"'>>/etc/raid_scripts/mail_alert")
+		os.system("sudo cat /cdrom/scripts/raid_mail_template | sudo grep -v \"^#\" >>/etc/raid_scripts/mail_alert")
+		os.system("sudo echo 'PROGRAM /etc/raid_scripts'>>/etc/mdadm/mdadm.conf")
+
+
 def main(argv):
 	raidStr=re.sub("\\\\", "", argv[0])
 	swapSize=argv[1]
 	raidLevel=argv[2]
 	fstype=argv[3]
-	initialize_raid(raidStr, int(swapSize), raidLevel, fstype)
+
+	emailParams = [ argv[4], argv[5], argv[6], argv[7], argv[8], argv[9], argv[10] ]
+
+	initialize_raid(raidStr, int(swapSize), raidLevel, fstype, emailParams)
 
 
 if __name__ == "__main__":
