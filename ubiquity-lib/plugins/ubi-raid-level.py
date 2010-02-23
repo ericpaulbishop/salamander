@@ -29,6 +29,10 @@ def run_shell(command):
 	result = subprocess.Popen([command], stdout=subprocess.PIPE, shell=True).communicate()[0]
 	return result
 
+#backslash strip, to get rid of \ character introduced before whitespace in debconf
+def bs(str):
+	str = re.sub("\\\\ ", " ", str)
+	return str
 
 def labelControl(labelText, control, controlFirst):
 	import pygtk
@@ -386,12 +390,12 @@ class PageGtk(PluginUI):
 
 class Page(Plugin):
 	def prepare(self, unfiltered=False):
-		diskStr = self.db.get('ubiquity/raid_disks')
-		rl      = self.db.get("ubiquity/raid_level")
-		sw      = self.db.get("ubiquity/raid_swap")
-		fs      = self.db.get("ubiquity/raid_file_system")
+		diskStr = bs(self.db.get('ubiquity/raid_disks'))
+		rl      = bs(self.db.get("ubiquity/raid_level"))
+		sw      = bs(self.db.get("ubiquity/raid_swap"))
+		fs      = bs(self.db.get("ubiquity/raid_file_system"))
 		
-		ep      = [ self.db.get("ubiquity/raid_use_email"), self.db.get("ubiquity/raid_email_server"), self.db.get("ubiquity/raid_email_user"), self.db.get("ubiquity/raid_email_password"), self.db.get("ubiquity/raid_email_port"), self.db.get("ubiquity/raid_email_from"), self.db.get("ubiquity/raid_email_to") ]
+		ep      = [ bs(self.db.get("ubiquity/raid_use_email")), bs(self.db.get("ubiquity/raid_email_server")), bs(self.db.get("ubiquity/raid_email_user")), bs(self.db.get("ubiquity/raid_email_password")), bs(self.db.get("ubiquity/raid_email_port")), bs(self.db.get("ubiquity/raid_email_from")), bs(self.db.get("ubiquity/raid_email_to")) ]
 		
 				
 		self.ui.setSelectionsFromDisks(diskStr, rl, sw, fs, ep)

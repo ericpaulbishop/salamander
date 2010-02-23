@@ -212,13 +212,18 @@ def initialize_raid(raidStr, swapSize, raidLevel, fstype, emailParams):
 		os.system("sudo echo 'PROGRAM /etc/raid_scripts'>>/etc/mdadm/mdadm.conf")
 
 
-def main(argv):
-	raidStr=re.sub("\\\\", "", argv[0])
-	swapSize=argv[1]
-	raidLevel=argv[2]
-	fstype=argv[3]
+#backslash strip, to get rid of \ character introduced before whitespace in debconf
+def bs(str):
+	str = re.sub("\\\\ ", " ", str)
+	return str
 
-	emailParams = [ argv[4], argv[5], argv[6], argv[7], argv[8], argv[9], argv[10] ]
+def main(argv):
+	raidStr=bs(argv[0])
+	swapSize=bs(argv[1])
+	raidLevel=bs(argv[2])
+	fstype=bs(argv[3])
+
+	emailParams = [ bs(argv[4]), bs(argv[5]), bs(argv[6]), bs(argv[7]), bs(argv[8]), bs(argv[9]), bs(argv[10]) ]
 
 	initialize_raid(raidStr, int(swapSize), raidLevel, fstype, emailParams)
 
