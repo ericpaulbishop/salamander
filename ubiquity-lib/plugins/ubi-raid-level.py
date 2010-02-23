@@ -261,14 +261,14 @@ class PageGtk(PluginUI):
 		
 		if emailParameters[1] != None:
 			if emailParameters[1] != "":
-				if emailParameters[1] != "smtp.gmail.com"
+				if emailParameters[1] != "smtp.gmail.com":
 					self.useGmailControl.set_active(1)
 					self.rebuildEmailTable()
-					for cntlIndex in range(0:len(emailControls))
-						if emailParameters[cntlIndex+1] != None:
-							if emailParameters[cntlIndex+1] != "":
-								(self.emailControls[cntlIndex]).set_text( emailParameters[cntlIndex+1] )
-				else
+					for cntlIndex in range(1,len(emailParameters)):
+						if emailParameters[cntlIndex] != None:
+							if emailParameters[cntlIndex] != "":
+								(self.emailControls[cntlIndex-1]).set_text( emailParameters[cntlIndex] )
+				else:
 					if emailParameters[2] != None:
 							if emailParameters[2] != "":
 								(self.gmailControls[0]).set_text( emailParameters[2] )
@@ -282,7 +282,7 @@ class PageGtk(PluginUI):
 
 
 		if emailParameters[0] != None:
-			if emailParameters[0] == "false"
+			if emailParameters[0] == "false":
 				self.useEmailCheck.set_active(False)
 				self.useEmailCallback(self.useEmailCheck)
 		
@@ -302,19 +302,19 @@ class PageGtk(PluginUI):
 	
 		emailLabels   = [ "\tEmail Server:", "\tServer User:", "\tServer Password:", "\tServer Port:", "\tFrom Address:", "\tRecipient Addresses:" ]
 		gmailLabels   = [ "\tGmail User:", "\tGmail Password:", "\tRecipient Addresses:" ]
-		emailDefaults = [ "smtp.myserver.com", "my_username", "", "25", "me@myserver.com", "recipient@somewhere.com"
+		emailDefaults = [ "smtp.myserver.com", "my_username", "", "25", "me@myserver.com", "recipient@somewhere.com"]
 		gmailDefaults = [ "my_username@gmail.com", "", "recipient@somewhere.com" ]
 		
 		if len(emailDefaults) != len(self.emailControls):
 			self.emailControls = []
-			for cntlIndex in range(0:len(emailDefaults)):
+			for cntlIndex in range(0,len(emailDefaults)):
 				cntl = gtk.Entry(50)
 				cntl.set_text( emailDefaults[cntlIndex] )
 				self.emailControls.append(cntl)
 
 		if len(gmailDefaults) != len(self.gmailControls):
 			self.gmailControls = []
-			for cntlIndex in range(0:len(gmailDefaults)):
+			for cntlIndex in range(0,len(gmailDefaults)):
 				cntl = gtk.Entry(50)
 				cntl.set_text( gmailDefaults[cntlIndex] )
 				self.gmailControls.append(cntl)
@@ -324,14 +324,14 @@ class PageGtk(PluginUI):
 		
 		controlLabels = emailLabels
 		self.emailTable = gtk.Table(6,2)
-		controlList = emailControls
+		controlList = self.emailControls
 		if gmailSelection == "Use Gmail":
 			controlLabels = gmailLabels
-			controlList = gmailControls
+			controlList = self.gmailControls
 
 
 		tableRowIndex=0
-		for labelText in emailControlLabels:
+		for labelText in controlLabels:
 			eControl = controlList[tableRowIndex]
 			eLabelContainer = labelControl("", gtk.Label(labelText), 1)
 			eControl.show()
@@ -368,13 +368,14 @@ class PageGtk(PluginUI):
 			emailParams.append("false")
 
 		if gmailSelection == "Use Gmail":
-			user = ((gmailControls[0]).get_text()).lower()
-			if !re.search("gmail.com", user):
+			user = ((self.gmailControls[0]).get_text()).lower()
+			if not re.search("gmail.com", user):
 				user = user + "@gmail.com"
-			emailParams = [ "smtp.gmail.com", user, (gmailControls[1]).get_text(), "587", user, (gmailControls[2]).get_text() ]
-		else
-			for paramIndex in range(0,len(emailControls)):
-				emailParams.append( (gmailControls[paramIndex]).get_text() )
+			useEmail = emailParams[0]
+			emailParams = [ useEmail, "smtp.gmail.com", user, (self.gmailControls[1]).get_text(), "587", user, (self.gmailControls[2]).get_text() ]
+		else:
+			for paramIndex in range(0,len(self.emailControls)):
+				emailParams.append( (self.emailControls[paramIndex]).get_text() )
 		
 		return emailParams
 
