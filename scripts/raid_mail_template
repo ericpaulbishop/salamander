@@ -1,0 +1,56 @@
+#!/usr/bin/python
+
+#serverName     = 
+#serverUserName = 
+#serverPassword = 
+#serverPort     = 
+#mailFrom       = 
+#mailTo         =
+
+
+import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email.MIMEText import MIMEText
+from email import Encoders
+import sys
+import os
+import re
+
+def mail(serverName, serverUserName, serverPassword, serverPort, mailFrom, mailTo, subject, text):
+	
+	toList = re.split("[\t\r\n, ]+", mailTo)
+	
+	for to in toList:
+		msg = MIMEMultipart()
+		msg['From'] = mailFrom
+		msg['To'] = to
+		msg['Subject'] = subject
+		msg.attach(MIMEText(text))
+
+		mailServer = smtplib.SMTP(serverName, int(serverPort), "localhost", 30)
+		mailServer.ehlo()
+		if mailServer.has_extn('STARTTLS'):
+			mailServer.starttls()
+			mailServer.ehlo()
+		mailServer.login(serverUserName, serverPassword)
+		mailServer.sendmail(mailFrom, to, msg.as_string())
+		mailServer.close()
+
+
+def main(argv):
+	event = argv[0]
+	disk  = argv[1]
+	
+	message = ""
+	if event == "Fail":
+		message = "Disk " + disk + " has Failed"
+	else:
+		message = event + " event detected on disk " + disk
+
+	mail(serverName, serverUserName, serverPassword, serverPort, mailFrom, mailTo, "RAID Alert: " + disk, message)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
+
