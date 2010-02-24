@@ -209,7 +209,7 @@ def initialize_raid(raidStr, swapSize, raidLevel, fstype, emailParams):
 		os.system("sudo echo 'mailFrom       =\"" + emailParams[5] + "\"'>>/etc/raid_scripts/mail_alert")
 		os.system("sudo echo 'mailTo         =\"" + emailParams[6] + "\"'>>/etc/raid_scripts/mail_alert")
 		os.system("sudo cat /cdrom/scripts/raid_mail_template | sudo grep -v \"^#\" >>/etc/raid_scripts/mail_alert")
-		os.system("sudo echo 'PROGRAM /etc/raid_scripts'>>/etc/mdadm/mdadm.conf")
+		os.system("sudo echo 'PROGRAM /etc/raid_scripts/mail_alert'>>/etc/mdadm/mdadm.conf")
 
 
 #backslash strip, to get rid of \ character introduced before whitespace in debconf
