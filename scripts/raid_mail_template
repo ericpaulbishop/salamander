@@ -39,16 +39,28 @@ def mail(serverName, serverUserName, serverPassword, serverPort, mailFrom, mailT
 
 
 def main(argv):
-	event = argv[0]
-	disk  = argv[1]
-	
+	event      = argv[0]
+	raid_disk  = argv[1]
+	phys_disk  = "" 
+
+	if  len(argv) > 2:
+		phys_disk = argv[2]
+
+	subject = "RAID Alert: " + raid_disk	
+	if os.path.isfile("/etc/hostname"):
+		hf = open("/etc/hostname", "r")
+		hostname = hf.read().rstrip("\r\n")
+		subject = "RAID Alert on "+ hostname + ": " + raid_disk
+
 	message = ""
 	if event == "Fail":
-		message = "Disk " + disk + " has Failed"
+		message = "Disk " + phys_disk + " has Failed on RAID array " + raid_disk
 	else:
-		message = event + " event detected on disk " + disk
+		message = event + " event detected on RAID array " + raid_disk
+		if phys_disk != "":
+			message = message + ", disk " + phys_disk
 
-	mail(serverName, serverUserName, serverPassword, serverPort, mailFrom, mailTo, "RAID Alert: " + disk, message)
+	mail(serverName, serverUserName, serverPassword, serverPort, mailFrom, mailTo, subject, message)
 
 
 if __name__ == "__main__":
