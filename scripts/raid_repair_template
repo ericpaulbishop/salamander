@@ -40,10 +40,10 @@ def run_shell(command):
 def repair_raid(diskDev):
 
 
-	os.system("sudo mdadm --manage /dev/md0 --fail "   + diskDev + "1 2>/dev/null"
-	os.system("sudo mdadm --manage /dev/md0 --remove " + diskDev + "1 2>/dev/null"
-	os.system("sudo mdadm --manage /dev/md1 --fail "   + diskDev + "2 2>/dev/null"
-	os.system("sudo mdadm --manage /dev/md1 --remove " + diskDev + "2 2>/dev/null"
+	os.system("sudo mdadm --manage /dev/md0 --fail "   + diskDev + "1 2>/dev/null")
+	os.system("sudo mdadm --manage /dev/md0 --remove " + diskDev + "1 2>/dev/null")
+	os.system("sudo mdadm --manage /dev/md1 --fail "   + diskDev + "2 2>/dev/null")
+	os.system("sudo mdadm --manage /dev/md1 --remove " + diskDev + "2 2>/dev/null")
 	print "sudo parted -s " + diskDev + " mklabel msdos"
 	os.system("sudo parted -s " + diskDev + " mklabel msdos")
 
@@ -63,9 +63,9 @@ def repair_raid(diskDev):
 
 
 	#add partitions back to raid array
-	os.system("sudo mdadm --manage /dev/md0 --add " + diskDev + "1 2>/dev/null"
+	os.system("sudo mdadm --manage /dev/md0 --add " + diskDev + "1 2>/dev/null")
 	if swapMb > 0: 
-		os.system("sudo mdadm --manage /dev/md1 --add " + diskDev + "2 2>/dev/null"
+		os.system("sudo mdadm --manage /dev/md1 --add " + diskDev + "2 2>/dev/null")
 	
 
 

@@ -212,7 +212,7 @@ def initialize_raid(raidStr, swapSize, raidLevel, fstype, emailParams):
 		os.system("sudo echo 'PROGRAM /etc/raid_scripts/mail_alert'>>/etc/mdadm/mdadm.conf")
 	
 	#setup raid_repair script
-	os.system("sudo echo '#!/usr/bin/python'>/usr/bin/raid_repair")
+	os.system("sudo echo '#!/usr/bin/python'>/usr/sbin/raid_repair")
 	os.system("sudo echo ''>>/usr/sbin/raid_repair")
 	os.system("sudo echo 'raidMb = " + str(raidMb) + "'>>/usr/sbin/raid_repair")
 	os.system("sudo echo 'rootMb = " + str(rootMb) + "'>>/usr/sbin/raid_repair")
