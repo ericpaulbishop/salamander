@@ -40,11 +40,13 @@ def run_shell(command):
 def repair_raid(diskDev):
 
 
+	#at this point drive should NOT be part of raid... but just be sure
 	os.system("sudo mdadm --manage /dev/md0 --fail "   + diskDev + "1 2>/dev/null")
 	os.system("sudo mdadm --manage /dev/md0 --remove " + diskDev + "1 2>/dev/null")
 	os.system("sudo mdadm --manage /dev/md1 --fail "   + diskDev + "2 2>/dev/null")
 	os.system("sudo mdadm --manage /dev/md1 --remove " + diskDev + "2 2>/dev/null")
-	print "sudo parted -s " + diskDev + " mklabel msdos"
+	
+	print     "sudo parted -s " + diskDev + " mklabel msdos"
 	os.system("sudo parted -s " + diskDev + " mklabel msdos")
 
 
@@ -54,26 +56,37 @@ def repair_raid(diskDev):
 	swapPartStartEnd = str(gapMb+rootMb) + " " + str(gapMb+rootMb+swapMb)
 
 	#create partitions to be included in raid array
-	print "sudo parted -s " + diskDev + " mkpart primary " + rootPartStartEnd
+	print     "sudo parted -s " + diskDev + " mkpart primary " + rootPartStartEnd
 	os.system("sudo parted -s " + diskDev + " mkpart primary " + rootPartStartEnd)
+	print     "sudo parted -s " + diskDev + " set 1 raid on"
 	os.system("sudo parted -s " + diskDev + " set 1 raid on")
 	if swapMb > 0:
+		print     "sudo parted -s " + diskDev + " mkpart primary " + swapPartStartEnd
 		os.system("sudo parted -s " + diskDev + " mkpart primary " + swapPartStartEnd )
+		print     "sudo parted -s " + diskDev + " set 2 raid on"
 		os.system("sudo parted -s " + diskDev + " set 2 raid on")
+
+	#install grub2 to MBR of this drive
+	print     "grub-install " + diskDev
+	os.system("grub-install " + diskDev )
 
 
 	#add partitions back to raid array
+	print     "sudo mdadm --manage /dev/md0 --add " + diskDev + "1"
 	os.system("sudo mdadm --manage /dev/md0 --add " + diskDev + "1 2>/dev/null")
 	if swapMb > 0: 
+		print     "sudo mdadm --manage /dev/md1 --add " + diskDev + "2"
 		os.system("sudo mdadm --manage /dev/md1 --add " + diskDev + "2 2>/dev/null")
 	
 
+	print "\n\nRAID disk added back to array.. degraded array should now be rebuilding"
 
 
 def main(argv):
 	if len(argv) == 0:
 		print "ERROR: You must specify disk to format and add back to RAID array "
-		print "       e.g. raid-prepare /dev/sdb\n"
+		print "       e.g. raid-prepare /dev/sdb"
+		print "       Also, this script must be run with root priviledges (use sudo)\n"
 	else:
 		diskDev=argv[0]
 		repair_raid(diskDev)
