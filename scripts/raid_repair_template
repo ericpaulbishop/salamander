@@ -72,8 +72,8 @@ def repair_raid(diskDev):
 
 def main(argv):
 	if len(argv) == 0:
-		print "ERROR: You must specify disk to prepare for inclusion in RAID array\n"
-		print "       e.g. raid-prepare /dev/sdb\n\n"
+		print "ERROR: You must specify disk to format and add back to RAID array "
+		print "       e.g. raid-prepare /dev/sdb\n"
 	else:
 		diskDev=argv[0]
 		repair_raid(diskDev)
