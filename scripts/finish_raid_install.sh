@@ -32,6 +32,15 @@ if [ -e "/etc/raid_scripts/mail_alert" ] ; then
 	chgrp -R root /target/etc/raid_scripts
 fi
 
+#install raid_repair script
+if [ -e /usr/bin/raid_repair ] ; then
+	cp /usr/sbin/raid_repair /target/usr/sbin/raid_repair
+	chmod 700     /target/usr/sbin/raid_repair
+	chown -R root /target/usr/sbin/raid_repair
+	chgrp -R root /target/usr/sbin/raid_repair
+
+fi
+
 #chroot to target to update initramfs
 ls /target/boot/*initrd* | sed 's/^.*\///g' >/tmp/initrdlist
 initrd_img=$(head -n1 /tmp/initrdlist)
