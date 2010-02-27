@@ -41,13 +41,13 @@ def repair_raid(diskDev):
 
 
 	#at this point drive should NOT be part of raid... but just be sure
-	os.system("sudo mdadm --manage /dev/md0 --fail "   + diskDev + "1 2>/dev/null")
-	os.system("sudo mdadm --manage /dev/md0 --remove " + diskDev + "1 2>/dev/null")
-	os.system("sudo mdadm --manage /dev/md1 --fail "   + diskDev + "2 2>/dev/null")
-	os.system("sudo mdadm --manage /dev/md1 --remove " + diskDev + "2 2>/dev/null")
+	os.system("sudo mdadm --manage /dev/md0 --fail "   + diskDev + "1 >/dev/null 2>&1")
+	os.system("sudo mdadm --manage /dev/md0 --remove " + diskDev + "1 >/dev/null 2>&1")
+	os.system("sudo mdadm --manage /dev/md1 --fail "   + diskDev + "2 >/dev/null 2>&1")
+	os.system("sudo mdadm --manage /dev/md1 --remove " + diskDev + "2 >/dev/null 2>&1")
 	
-	print     "sudo parted -s " + diskDev + " mklabel msdos"
-	os.system("sudo parted -s " + diskDev + " mklabel msdos")
+	print          "parted -s " + diskDev + " mklabel msdos"
+	os.system("sudo parted -s " + diskDev + " mklabel msdos  >/dev/null 2>&1")
 
 
 	#parted takes numbers in MB, where it thinks 1MB is exactly 10^7 bytes
@@ -56,30 +56,30 @@ def repair_raid(diskDev):
 	swapPartStartEnd = str(gapMb+rootMb) + " " + str(gapMb+rootMb+swapMb)
 
 	#create partitions to be included in raid array
-	print     "sudo parted -s " + diskDev + " mkpart primary " + rootPartStartEnd
-	os.system("sudo parted -s " + diskDev + " mkpart primary " + rootPartStartEnd)
-	print     "sudo parted -s " + diskDev + " set 1 raid on"
-	os.system("sudo parted -s " + diskDev + " set 1 raid on")
+	print          "parted -s " + diskDev + " mkpart primary " + rootPartStartEnd
+	os.system("sudo parted -s " + diskDev + " mkpart primary " + rootPartStartEnd + " >/dev/null 2>&1")
+	print          "parted -s " + diskDev + " set 1 raid on"
+	os.system("sudo parted -s " + diskDev + " set 1 raid on  >/dev/null 2>&1")
 	if swapMb > 0:
-		print     "sudo parted -s " + diskDev + " mkpart primary " + swapPartStartEnd
-		os.system("sudo parted -s " + diskDev + " mkpart primary " + swapPartStartEnd )
-		print     "sudo parted -s " + diskDev + " set 2 raid on"
-		os.system("sudo parted -s " + diskDev + " set 2 raid on")
+		print          "parted -s " + diskDev + " mkpart primary " + swapPartStartEnd
+		os.system("sudo parted -s " + diskDev + " mkpart primary " + swapPartStartEnd + " >/dev/null 2>&1")
+		print          "parted -s " + diskDev + " set 2 raid on"
+		os.system("sudo parted -s " + diskDev + " set 2 raid on  >/dev/null 2>&1")
 
 	#install grub2 to MBR of this drive
-	print     "grub-install " + diskDev
-	os.system("grub-install " + diskDev )
+	print          "grub-install " + diskDev
+	os.system("sudo grub-install " + diskDev + " >/dev/null 2>&1")
 
 
 	#add partitions back to raid array
-	print     "sudo mdadm --manage /dev/md0 --add " + diskDev + "1"
-	os.system("sudo mdadm --manage /dev/md0 --add " + diskDev + "1 2>/dev/null")
+	print          "mdadm --manage /dev/md0 --add " + diskDev + "1"
+	os.system("sudo mdadm --manage /dev/md0 --add " + diskDev + "1  >/dev/null 2>&1")
 	if swapMb > 0: 
-		print     "sudo mdadm --manage /dev/md1 --add " + diskDev + "2"
-		os.system("sudo mdadm --manage /dev/md1 --add " + diskDev + "2 2>/dev/null")
+		print          "mdadm --manage /dev/md1 --add " + diskDev + "2"
+		os.system("sudo mdadm --manage /dev/md1 --add " + diskDev + "2  >/dev/null 2>&1")
 	
 
-	print "\n\nRAID disk added back to array.. degraded array should now be rebuilding"
+	print "\n\nRAID disk added back to array. Degraded array should now be rebuilding\n"
 
 
 def main(argv):
