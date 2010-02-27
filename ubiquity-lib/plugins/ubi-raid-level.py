@@ -314,6 +314,9 @@ class PageGtk(PluginUI):
 			for cntlIndex in range(0,len(emailDefaults)):
 				cntl = gtk.Entry(50)
 				cntl.set_text( emailDefaults[cntlIndex] )
+				if re.search("Password", emailLabels[cntlIndex]):
+					cntl.set_invisible_char('*')
+					cntl.set_visibility(False)
 				self.emailControls.append(cntl)
 
 		if len(gmailDefaults) != len(self.gmailControls):
@@ -321,8 +324,10 @@ class PageGtk(PluginUI):
 			for cntlIndex in range(0,len(gmailDefaults)):
 				cntl = gtk.Entry(50)
 				cntl.set_text( gmailDefaults[cntlIndex] )
+				if re.search("Password", gmailLabels[cntlIndex]):
+					cntl.set_invisible_char('*')
+					cntl.set_visibility(False)
 				self.gmailControls.append(cntl)
-
 
 		gmailSelection = self.useGmailControl.get_active_text()
 		
