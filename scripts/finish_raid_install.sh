@@ -33,7 +33,7 @@ if [ -e "/etc/raid_scripts/mail_alert" ] ; then
 fi
 
 #install raid_repair script
-if [ -e /usr/bin/raid_repair ] ; then
+if [ -e /usr/sbin/raid_repair ] ; then
 	cp /usr/sbin/raid_repair /target/usr/sbin/raid_repair
 	chmod 700     /target/usr/sbin/raid_repair
 	chown -R root /target/usr/sbin/raid_repair
