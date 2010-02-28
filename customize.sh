@@ -1,10 +1,11 @@
 #!/bin/bash
 
-#iso_file="ubuntu-9.10-desktop-amd64.iso"
-iso_file="ubuntu-9.10-desktop-i386.iso"
+iso_file="$1"
+iso_out="$2"
+
 
 #cleanup
-rm -rf salamander.iso squashfs-root extract-iso
+rm -rf "$iso_out" squashfs-root extract-iso
 
 if [ ! -d "downloaded" ] ; then
 	rm -rf downloaded
@@ -112,7 +113,6 @@ cp isolinux/* extract-iso/isolinux/
 
 
 #build new cd image
-rm -rf salamander.iso
 chmod +w extract-iso/casper/filesystem.manifest
 chroot squashfs-root dpkg-query -W --showformat='${Package} ${Version}\n' > extract-iso/casper/filesystem.manifest
 cp extract-iso/casper/filesystem.manifest extract-iso/casper/filesystem.manifest-desktop
@@ -124,4 +124,4 @@ cd extract-iso
 rm md5sum.txt
 find -type f -print0 | sudo xargs -0 md5sum | grep -v isolinux/boot.cat | sudo tee md5sum.txt
 
-mkisofs -D -r -V "salamander" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ../salamander.iso .
+mkisofs -D -r -V "salamander" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o "../$iso_out" .
